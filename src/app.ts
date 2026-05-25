@@ -9,8 +9,6 @@ const app: Application = express();
 
 app.use(CookieParser());
 app.use(express.json());
-// app.use(express.text());
-// app.use(express.urlencoded({ extended: true }));
 
 app.use(
   cors({

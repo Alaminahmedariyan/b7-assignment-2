@@ -8,7 +8,7 @@ export const pool = new Pool({
 
 export const initDB = async () => {
   try {
-    // 1. Users table (as per spec)
+    // 1. Users table
     await pool.query(`
       CREATE TABLE IF NOT EXISTS users (
         id         SERIAL PRIMARY KEY,
@@ -22,7 +22,7 @@ export const initDB = async () => {
       );
     `);
 
-    // 2. Issues table (no foreign key constraint, as spec allows)
+    // 2. Issues table 
     await pool.query(`
       CREATE TABLE IF NOT EXISTS issues (
         id          SERIAL PRIMARY KEY,
