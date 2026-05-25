@@ -1,28 +1,26 @@
-import jwt from 'jsonwebtoken'
+import jwt from "jsonwebtoken";
+import config from "../config/index.js";
 
 export interface JwtPayload {
-  id: number
-  name: string
-  role: string
+  id: number;
+  name: string;
+  role: string;
 }
 
-// ── Sign JWT with user id, name, role in payload ──────────────
-export const signToken = (payload: JwtPayload): string => {
-  const secret = process.env['JWT_SECRET']
-  if (!secret) throw new Error('JWT_SECRET is not defined')
+export const verifyToken = (token: string, type: "access" | "refresh"): JwtPayload => {
+  const secret = type === "refresh" ? config.refresh_secret : config.jwt_secret;
+  const decoded = jwt.verify(token, secret) as JwtPayload;
+  return decoded;
+};
 
-  const expiresIn = process.env['JWT_EXPIRES_IN'] ?? '7d'
+export const signToken = (payload: JwtPayload): { accessToken: string; refreshToken: string } => {
+  const accessToken = jwt.sign(payload, config.jwt_secret, {
+    expiresIn: "7d",
+  });
 
-  return jwt.sign(payload, secret, {
-    expiresIn: expiresIn as jwt.SignOptions['expiresIn'],
-  })
-}
+  const refreshToken = jwt.sign(payload, config.refresh_secret, {
+    expiresIn: "30d",
+  });
 
-// ── Verify JWT and return decoded payload ─────────────────────
-export const verifyToken = (token: string): JwtPayload => {
-  const secret = process.env['JWT_SECRET']
-  if (!secret) throw new Error('JWT_SECRET is not defined')
-
-  const decoded = jwt.verify(token, secret)
-  return decoded as JwtPayload
-}
+  return { accessToken, refreshToken };
+};
