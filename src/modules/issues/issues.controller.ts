@@ -134,8 +134,7 @@ const deleteIssue = catchAsync(async (req: Request, res: Response, _next: NextFu
   sendResponse(res, {
     statusCode: StatusCodes.OK,
     success: true,
-    message: "Issue deleted successfully",
-    data: null,
+    message: "Issue deleted successfully"
   });
 });
 
