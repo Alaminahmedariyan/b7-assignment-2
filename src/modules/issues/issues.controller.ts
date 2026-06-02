@@ -1,8 +1,8 @@
 import type { Request, Response, NextFunction } from "express";
 import { StatusCodes } from "http-status-codes";
 import sendResponse from "../../utils/sendResponse";
-import { issuesService } from "./issues.service";
 import catchAsync from "../../utils/catchAsync";
+import { issuesService } from "./issues.service";
 
 const createIssue = catchAsync(async (req: Request, res: Response, _next: NextFunction): Promise<void> => {
   const { title, description, type } = req.body;

@@ -137,12 +137,17 @@ const updateIssueInDB = async (
   queryParams.push(id);
   const updateSql = `
     UPDATE issues 
-    SET ${updates.join(", ")}, updated_at = CURRENT_TIMESTAMP 
+    SET ${updates.join(", ")}, updated_at = NOW() 
     WHERE id = $${queryParams.length}
     RETURNING id, title, description, type, status, reporter_id, created_at, updated_at
   `;
   const finalResult = await query<IssueRow>(updateSql, queryParams);
-return finalResult.rows[0]!;
+  
+  if (!finalResult.rows[0]) {
+    throw new AppError(StatusCodes.INTERNAL_SERVER_ERROR, "Failed to update the issue.");
+  }
+  
+  return finalResult.rows[0];
 };
 
 const deleteIssueFromDB = async (id: number): Promise<void> => {
