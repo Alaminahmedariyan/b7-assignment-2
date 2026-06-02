@@ -1,5 +1,3 @@
-// ── Request body types ────────────────────────────────────────
-
 export interface SignupBody {
   name: string;
   email: string;
@@ -12,7 +10,6 @@ export interface LoginBody {
   password: string;
 }
 
-// ── DB row shape returned from users table ────────────────────
 export interface UserRow {
   id: number;
   name: string;
@@ -23,7 +20,6 @@ export interface UserRow {
   updated_at: string;
 }
 
-// ── Safe user object sent in responses (password excluded) ────
 export interface SafeUser {
   id: number;
   name: string;
@@ -33,7 +29,6 @@ export interface SafeUser {
   updated_at: string;
 }
 
-// ── Token payload shape ───────────────────────────────────────
 export interface TokenPayload {
   id: number;
   name: string;
