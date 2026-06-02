@@ -1,9 +1,10 @@
 import bcrypt from "bcrypt";
 import { query, findOneBy } from "../../utils/query.util";
 import { signToken } from "../../utils/jwt.util";
-import type { SignupBody, LoginBody, UserRow, SafeUser, TokenPayload } from "./auth.types.js";
+import type { SignupBody, LoginBody, UserRow, SafeUser, TokenPayload } from "./auth.types";
 import { StatusCodes } from "http-status-codes";
 import { AppError } from "../../middlewares/appError";
+import type { JwtPayload } from "../../utils/jwt.util";
 
 const toSafeUser = (user: UserRow): SafeUser => ({
   id: user.id,
@@ -53,7 +54,7 @@ const loginUser = async (
     throw new AppError(StatusCodes.UNAUTHORIZED, "Invalid email or password.");
   }
 
-  const tokenPayload: TokenPayload = {
+  const tokenPayload: JwtPayload = {
     id: user.id,
     name: user.name,
     role: user.role,

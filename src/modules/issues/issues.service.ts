@@ -1,4 +1,4 @@
-import { query } from "../../utils/query.util";
+import { query, findUsersByIds } from "../../utils/query.util";
 import { StatusCodes } from "http-status-codes";
 import type { IssueRow, CreateIssueBody, UpdateIssueBody, IssueFormattedResponse, IssueReporter } from "./issues.types";
 import { AppError } from "../../middlewares/appError";
@@ -47,11 +47,10 @@ const getAllIssuesFromDB = async (filters: { sort?: string; type?: string; statu
   if (issues.length === 0) return [];
 
   const reporterIds = Array.from(new Set(issues.map((i) => i.reporter_id)));
-  const userSql = `SELECT id, name, role FROM users WHERE id IN (${reporterIds.map((_, idx) => `$${idx + 1}`).join(", ")})`;
-  const usersResult = await query<IssueReporter>(userSql, reporterIds);
-  
+  const usersResult = await findUsersByIds(reporterIds);
+
   const userMap = new Map<number, IssueReporter>();
-  usersResult.rows.forEach((user) => userMap.set(user.id, user));
+  usersResult.forEach((user) => userMap.set(user.id, user));
 
   return issues.map((issue) => ({
     id: issue.id,
@@ -132,11 +131,7 @@ const updateIssueInDB = async (
   if (updates.length === 0) {
     const freshSql = `SELECT id, title, description, type, status, reporter_id, created_at, updated_at FROM issues WHERE id = $1`;
     const freshResult = await query<IssueRow>(freshSql, [id]);
-   if (updates.length === 0) {
-  const freshSql = `SELECT id, title, description, type, status, reporter_id, created_at, updated_at FROM issues WHERE id = $1`;
-  const freshResult = await query<IssueRow>(freshSql, [id]);
-  return freshResult.rows[0]!;
-}
+    return freshResult.rows[0]!;
   }
 
   queryParams.push(id);

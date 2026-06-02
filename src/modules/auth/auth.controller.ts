@@ -1,15 +1,11 @@
 import type { Request, Response, NextFunction } from "express";
 import { StatusCodes } from "http-status-codes";
 import sendResponse from "../../utils/sendResponse";
-import { authService } from "./auth.service.js";
-import type { SignupBody, LoginBody } from "./auth.types.js";
+import { authService } from "./auth.service";
+import type { SignupBody, LoginBody } from "./auth.types";
 import catchAsync from "../../utils/catchAsync";
 
-const signup = catchAsync(async (
-  req: Request<any, any, SignupBody>,
-  res: Response,
-  _next: NextFunction
-): Promise<void> => {
+const signup = catchAsync(async (req: Request<unknown, unknown, SignupBody>, res: Response, _next: NextFunction): Promise<void> => {
   const { name, email, password, role } = req.body;
 
   if (!name || !email || !password) {
@@ -45,11 +41,7 @@ const signup = catchAsync(async (
   });
 });
 
-const login = catchAsync(async (
-  req: Request<any, any, LoginBody>,
-  res: Response,
-  _next: NextFunction
-): Promise<void> => {
+const login = catchAsync(async (req: Request<unknown, unknown, LoginBody>, res: Response, _next: NextFunction): Promise<void> => {
   const { email, password } = req.body;
 
   if (!email || !password) {

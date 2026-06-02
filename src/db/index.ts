@@ -3,7 +3,7 @@ import config from "../config";
 
 
 export const pool = new Pool({
-  connectionString: config.connection_string,
+ connectionString: config.database_url,
 });
 
 export const initDB = async () => {

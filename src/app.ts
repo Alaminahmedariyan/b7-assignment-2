@@ -1,27 +1,35 @@
-import CookieParser from "cookie-parser";
+import express from "express";
+import type { Request, Response } from "express";
 import cors from "cors";
-import express, {
-  type Application,
-  type Request,
-  type Response,
-} from "express";
-const app: Application = express();
+import { StatusCodes } from "http-status-codes";
 
-app.use(CookieParser());
+import globalErrorHandler from "./middlewares/globalErrorHandler";
+import globalRoutes from "./routes/index";
+
+const app = express();
+
+app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-app.use(
-  cors({
-    origin: "http://localhost:3000",
-  }),
-);
-
-app.get("/", (req: Request, res: Response) => {
-  //res.send("Hello World!");
-  res.status(200).json({
-    message: "DevPulse Server",
-    author: "Next Level",
+app.get("/", (_req: Request, res: Response) => {
+  res.json({
+    success: true,
+    message: " DevPulse API is running",
+    version: "1.0.0",
   });
 });
+
+app.use("/api", globalRoutes);
+
+app.use((req: Request, res: Response) => {
+  res.status(StatusCodes.NOT_FOUND).json({
+    success: false,
+    message: `Route ${req.method} ${req.path} not found.`,
+    errors: "The requested endpoint does not exist.",
+  });
+});
+
+app.use(globalErrorHandler);
 
 export default app;

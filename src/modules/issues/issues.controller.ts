@@ -4,9 +4,9 @@ import sendResponse from "../../utils/sendResponse";
 import { issuesService } from "./issues.service";
 import catchAsync from "../../utils/catchAsync";
 
-const createIssue = catchAsync(async (req: Request<any, any, any>, res: Response, _next: NextFunction): Promise<void> => {
+const createIssue = catchAsync(async (req: Request, res: Response, _next: NextFunction): Promise<void> => {
   const { title, description, type } = req.body;
-const reporterId = (req.user as any).id;
+  const reporterId = req.user!.id;
 
   if (!title || !description || !type) {
     res.status(StatusCodes.BAD_REQUEST).json({
@@ -54,7 +54,7 @@ const reporterId = (req.user as any).id;
   });
 });
 
-const getAllIssues = catchAsync(async (req: Request<any, any, any>, res: Response, _next: NextFunction): Promise<void> => {
+const getAllIssues = catchAsync(async (req: Request, res: Response, _next: NextFunction): Promise<void> => {
   const { sort, type, status } = req.query;
 
   const result = await issuesService.getAllIssuesFromDB({
@@ -71,7 +71,7 @@ const getAllIssues = catchAsync(async (req: Request<any, any, any>, res: Respons
   });
 });
 
-const getSingleIssue = catchAsync(async (req: Request<any, any, any>, res: Response, _next: NextFunction): Promise<void> => {
+const getSingleIssue = catchAsync(async (req: Request, res: Response, _next: NextFunction): Promise<void> => {
   const { id } = req.params;
 
   const result = await issuesService.getSingleIssueFromDB(Number(id));
@@ -84,10 +84,10 @@ const getSingleIssue = catchAsync(async (req: Request<any, any, any>, res: Respo
   });
 });
 
-const updateIssue = catchAsync(async (req: Request<any, any, any>, res: Response, _next: NextFunction): Promise<void> => {
+const updateIssue = catchAsync(async (req: Request, res: Response, _next: NextFunction): Promise<void> => {
   const { id } = req.params;
   const { title, description, type } = req.body;
-  const user = req.user;
+  const user = req.user!;
 
   if (title !== undefined && title.length > 150) {
     res.status(StatusCodes.BAD_REQUEST).json({
@@ -126,7 +126,7 @@ const updateIssue = catchAsync(async (req: Request<any, any, any>, res: Response
   });
 });
 
-const deleteIssue = catchAsync(async (req: Request<any, any, any>, res: Response, _next: NextFunction): Promise<void> => {
+const deleteIssue = catchAsync(async (req: Request, res: Response, _next: NextFunction): Promise<void> => {
   const { id } = req.params;
 
   await issuesService.deleteIssueFromDB(Number(id));

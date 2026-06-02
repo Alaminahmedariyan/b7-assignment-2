@@ -6,13 +6,13 @@ dotenv.config({
 });
 
 const config = {
-  connection_string: process.env.CONNECTIONSTRING as string,
+  database_url: (process.env.DATABASE_URL || process.env.database_url) as string,
   port: process.env["PORT"] || 5000,
   node_env: process.env["NODE_ENV"] || "development",
-  database_url: process.env["DATABASE_URL"] as string,
   jwt_secret: process.env.JWT_SECRET as string,
   refresh_secret: process.env.JWT_REFRESH_SECRET as string,
   jwt_expires_in: process.env["JWT_EXPIRES_IN"] || "7d",
+  refresh_expires_in: process.env["JWT_REFRESH_EXPIRES_IN"] || "30d",
 };
 
 export default config;

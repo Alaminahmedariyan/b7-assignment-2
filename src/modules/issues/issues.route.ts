@@ -11,4 +11,4 @@ router.get("/:id", issuesController.getSingleIssue);
 router.patch("/:id", authGuard("contributor", "maintainer"), issuesController.updateIssue);
 router.delete("/:id", authGuard("maintainer"), issuesController.deleteIssue);
 
-export default router;
+export const issueRoutes = router;

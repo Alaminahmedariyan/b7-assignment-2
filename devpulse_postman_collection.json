@@ -1,0 +1,180 @@
+{
+  "info": {
+    "name": "DevPulse API - Dev Collection",
+    "description": "Collection for DevPulse API (auth + issues). Login test saves token; create issue saves issueId.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "version": "1.0.0"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:5000/api" },
+    { "key": "token", "value": "" },
+    { "key": "issueId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Signup",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Test User\",\n  \"email\": \"test.user+{{random}}@example.com\",\n  \"password\": \"Password123!\",\n  \"role\": \"contributor\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/auth/signup", "host": ["{{baseUrl}}"], "path": ["auth", "signup"] }
+          },
+          "response": []
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"test.user+{{random}}@example.com\",\n  \"password\": \"Password123!\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/auth/login", "host": ["{{baseUrl}}"], "path": ["auth", "login"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Save token from login response to environment variable 'token'",
+                  "if (pm.response.code === 200) {",
+                  "  try {",
+                  "    const json = pm.response.json();",
+                  "    const token = json?.data?.token;",
+                  "    if (token) {",
+                  "      pm.environment.set('token', token);",
+                  "      console.log('Saved token to environment');",
+                  "    } else {",
+                  "      console.warn('No token found in response');",
+                  "    }",
+                  "  } catch (e) { console.error('Login response parse failed', e); }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Issues",
+      "item": [
+        {
+          "name": "Create Issue",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Sample issue from Postman\",\n  \"description\": \"This is a test issue created by the Postman collection.\",\n  \"type\": \"bug\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/issues", "host": ["{{baseUrl}}"], "path": ["issues"] }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "// Attach Authorization header if token exists",
+                  "const token = pm.environment.get('token');",
+                  "if (token) {",
+                  "  pm.request.headers.add({ key: 'Authorization', value: 'Bearer ' + token });",
+                  "} else {",
+                  "  console.warn('No token set in environment. Run Login first.');",
+                  "}"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Save created issue id to environment variable 'issueId'",
+                  "if (pm.response.code === 201) {",
+                  "  try {",
+                  "    const json = pm.response.json();",
+                  "    const id = json?.data?.id;",
+                  "    if (id) {",
+                  "      pm.environment.set('issueId', id);",
+                  "      console.log('Saved issueId', id);",
+                  "    }",
+                  "  } catch (e) { console.error(e); }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Get All Issues",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/issues", "host": ["{{baseUrl}}"], "path": ["issues"] }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Single Issue",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/issues/{{issueId}}", "host": ["{{baseUrl}}"], "path": ["issues", "{{issueId}}"] }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Issue",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Updated via Postman\",\n  \"description\": \"Updated description from Postman.\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/issues/{{issueId}}", "host": ["{{baseUrl}}"], "path": ["issues", "{{issueId}}"] }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const token = pm.environment.get('token'); if (token) { pm.request.headers.add({ key: 'Authorization', value: 'Bearer ' + token }); } else { console.warn('No token set.'); }"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Delete Issue",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/issues/{{issueId}}", "host": ["{{baseUrl}}"], "path": ["issues", "{{issueId}}"] }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const token = pm.environment.get('token'); if (token) { pm.request.headers.add({ key: 'Authorization', value: 'Bearer ' + token }); } else { console.warn('No token set.'); }"
+                ]
+              }
+            }
+          ],
+          "response": []
+        }
+      ]
+    }
+  ]
+}
